@@ -1,5 +1,8 @@
 # Проект Movies backend
 
+домен бекенда - api.movies.dip.nomoredomains.monster
+ip бекенда - 178.154.227.146
+
 ## Директории
 
 `/routes` — папка с файлами роутера  

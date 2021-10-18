@@ -6,19 +6,8 @@ const { port = 3000 } = process.env;
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
-const usersRoutes = require('./routes/users');
-const moviesRoutes = require('./routes/movies');
-const auth = require('./middlewares/auth');
+const routes = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const {
-  validateCreateUser,
-  validateLogin,
-} = require('./middlewares/validate');
-const {
-  login,
-  createUser,
-} = require('./controllers/users');
-const NoFoundError = require('./errors/noFoundError');
 
 const app = express();
 
@@ -30,8 +19,8 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb',
 app.use(helmet());
 
 const allowedCors = [
-  'https://mesto-denis-l.nomoredomains.club',
-  'http://mesto-denis-l.nomoredomains.club',
+  'https://movies.dip.nomoredomains.monster',
+  'http://movies.dip.nomoredomains.monster',
   'http://localhost:3000',
 ];
 
@@ -58,15 +47,7 @@ app.use(express.json());
 
 app.use(requestLogger);
 
-app.post('/signin', validateLogin, login);
-app.post('/signup', validateCreateUser, createUser);
-
-app.use('/users', auth, usersRoutes);
-app.use('/movies', auth, moviesRoutes);
-
-app.use('*', auth, () => {
-  throw new NoFoundError('Страница не найдена');
-});
+app.use(routes);
 
 app.use(errorLogger);
 
