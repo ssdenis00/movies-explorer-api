@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET = 'some-secret-key' } = process.env;
+const { JWT_SECRET } = require('../utils/constants');
 const User = require('../models/user');
 const AuthorizationError = require('../errors/authorizationError');
 const IncorrectDataError = require('../errors/incorrectDataError');
@@ -24,7 +24,8 @@ module.exports.createUser = (req, res, next) => {
           name,
         })
           .then((user) => {
-            res.status(201).send(user);
+            const { email: emailUser, name: nameUser, _id } = user;
+            res.status(201).send({ email: emailUser, name: nameUser, _id });
           })
           .catch((err) => {
             if (err.name === 'ValidationError') {
@@ -66,7 +67,7 @@ module.exports.updateUser = (req, res, next) => {
         }
       })
       .catch((err) => {
-        if (err.name === 'CastError' || err.name === 'ValidationError') {
+        if (err.name === 'ValidationError') {
           next(new IncorrectDataError('Переданы некорректные данные.'));
         } else if (err.code === 11000) {
           next(new CheckRepeatEmailError('Этот email уже существует на сервере.'));
@@ -104,10 +105,6 @@ module.exports.getOwner = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new IncorrectDataError('Переданы некорректные данные.'));
-      } else {
-        next(err);
-      }
+      next(err);
     });
 };
